@@ -9,7 +9,7 @@
 # 3) crontab -e
 #
 #   # Dynamically assign free CPUs to BOINC on multicore host every minute
-#   */1 * * * * /us r/bin/ruby /var/lib/boinc-client/control_boinc_ncpus.rb >> /var/ log/control_boinc_ncpus.log
+#   */1 * * * * /us r/bin/ruby /var/lib/boinc-client/control_boinc_ncpus.rb >> /var/log/control_boinc_ncpus.log
 #
 
 # Utils
