@@ -39,7 +39,7 @@ def processor_count
 end
 
 # Get system load average
-loadavg = `w|grep 'load average:'`.match(/load average: [\d\.]+,{0,1} [\d\.]+,{0,1} ([\d\.]+)/)[1].to_i
+loadavg = `w|grep 'load average'`.match(/load averages{0,1}: [\d\.]+[\,]{0,1} ([\d\.]+)[\,]{0,1} [\d\.]+/)[1].to_f
 puts "Current Load Average: #{loadavg}"
 
 # Get num CPUs
