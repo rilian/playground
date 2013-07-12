@@ -1,3 +1,17 @@
+#
+# Dynamically assign free CPUs to BOINC on multicore host
+#
+# Installation:
+# 1) sudo apt-get install ruby1.9.3
+#
+# 2) copy script to proper folder
+#
+# 3) crontab -e
+#
+#   # Dynamically assign free CPUs to BOINC on multicore host every minute
+#   */1 * * * * /us r/bin/ruby /var/lib/boinc-client/control_boinc_ncpus.rb >> /var/ log/control_boinc_ncpus.log
+#
+
 # Utils
 
 # taken from https://github.com/grosser/parallel/blob/master/lib/parallel.rb#L114
@@ -25,7 +39,7 @@ def processor_count
 end
 
 # Get system load average
-loadavg = `w|grep 'load averages:'`.match(/load averages: [\d\.]+ [\d\.]+ ([\d\.]+)/)[1].to_i
+loadavg = `w|grep 'load average:'`.match(/load average: [\d\.]+,{0,1} [\d\.]+,{0,1} ([\d\.]+)/)[1].to_i
 puts "Current Load Average: #{loadavg}"
 
 # Get num CPUs
@@ -64,7 +78,7 @@ end
 
 # Update BOINC CC config
 if current_ncpus != target_ncpus
-  `sed -i.bu 's/<ncpus>#{current_ncpus}</ncpus>/<ncpus>#{target_ncpus}</ncpus>/g' "#{cc_config_path}"`
+  `sed -i.bu 's/<ncpus>#{current_ncpus}</<ncpus>#{target_ncpus}</g' "#{cc_config_path}"`
 
   `cd #{File.dirname cc_config_path} && boinccmd --read_cc_config`
 
