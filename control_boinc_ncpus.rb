@@ -59,28 +59,23 @@ CC_CONFIGS.each do |path|
   end
 end
 raise "cc_config not found within #{CC_CONFIGS}" unless File.exists? cc_config_path
+puts "CC config found at #{cc_config_path}"
 
-current_ncpus = File.read(cc_config_path).match(/<ncpus>(\d+)<\/ncpus>/)[1].to_i
+current_ncpus = File.read(cc_config_path).match(/<ncpus>(\d+)</)[1].to_i
 puts "Current BOINC CPUs: #{current_ncpus}"
-target_ncpus = current_ncpus
 
 # Optimize num CPUs used by BOINC
-if loadavg > (current_cpus + 1) && target_ncpus > 0
-  # Decrease BOINC CPUs
-  target_ncpus -= 1
-  puts 'Decreasing BOINC ncpus'
-elsif loadavg < (current_cpus + 1) && target_ncpus < current_cpus
-  target_ncpus += 1
-  puts 'Increasing BOINC ncpus'
-else
-  puts 'Nothing to do here'
-end
+target_ncpus = current_cpus + 1 - loadavg
+target_ncpus = 1 if target_ncpus < 1
+target_ncpus = target_ncpus.to_i
+
+puts "Target BOINC CPUs: #{target_ncpus}"
 
 # Update BOINC CC config
 if current_ncpus != target_ncpus
   `sed -i.bu 's/<ncpus>#{current_ncpus}</<ncpus>#{target_ncpus}</g' "#{cc_config_path}"`
 
-  `cd #{File.dirname cc_config_path} && boinccmd --read_cc_config`
+  `cd "#{File.dirname cc_config_path}" && boinccmd --read_cc_config`
 
   # Validate
   changed_ncpus = File.read(cc_config_path).match(/<ncpus>(\d+)<\/ncpus>/)[1]
